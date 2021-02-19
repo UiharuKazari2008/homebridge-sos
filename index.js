@@ -116,3 +116,7 @@ module.exports = (homebridge) => {
 
   homebridge.registerAccessory('homebridge-sos', 'ACRSOS', HBSOS);
 };
+// eslint-disable-next-line func-names
+HBSOS.prototype.getServices = function() {
+  return [this.motionService];
+};
