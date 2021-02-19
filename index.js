@@ -65,7 +65,6 @@ class HBSOS {
               format: Characteristic.Formats.STRING,
               perms: [
                 Characteristic.Perms.READ,
-                Characteristic.Perms.WRITE,
                 Characteristic.Perms.NOTIFY,
               ],
             });
@@ -94,6 +93,7 @@ class HBSOS {
       if (results.length > 0) {
         results.forEach((object) => {
           if (object.uuid !== undefined) {
+            console.log(Characteristics[object.uuid]);
             MotionService
               .getCharacteristic(Characteristics[object.uuid])
               .updateValue(CustomServer.getItem(object.key));
