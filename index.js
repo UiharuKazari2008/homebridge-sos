@@ -229,7 +229,9 @@ class HBSOS {
       app.get('/set', async (req, res) => {
         if (req.query.item !== undefined && req.query.value !== undefined && req.query.item !== '' && req.query.value !== '') {
           // eslint-disable-next-line no-inner-declarations
-          this.triggerMotionEvent();
+          function trigger() {
+            this.triggerMotionEvent();
+          }
           function writeItem(uuid) {
             storage.setItem(req.query.item, {
               item: req.query.value,
@@ -241,6 +243,7 @@ class HBSOS {
                   res.status(200).send('OK');
                   Characteristics[uuid]
                     .setValue(results.content.value.item);
+                  trigger();
                   debug(`Save: "${results.content.key}" = "${results.content.value}"`);
                 } else {
                   res.status(500).send('SAVE_FAILED');
