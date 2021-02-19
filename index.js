@@ -88,7 +88,7 @@ class HBSOS {
 
     if (this.contactCall) {
       this.contactCall.forEach((contact) => {
-        const state = CustomServer.getItem(contact);
+        const state = this.getItem(contact);
         this.service = new Service.ContactSensor(state.key);
         this.service
           .getCharacteristic(Characteristic.ContactSensorState)
@@ -96,64 +96,39 @@ class HBSOS {
       });
     }
 
-    this.generateItems();
-    setTimeout(this.refreshValues, 5000);
-    setInterval(this.refreshValues, 60000);
-    this.startServer();
-  }
-
-  getMotion(callback) {
-    callback(null, MotionState);
-  }
-
-  getServices() {
-    return [MotionService];
-  }
-
-  async getAllItems() {
-    await storage.keys()
-      // eslint-disable-next-line consistent-return
-      .then((keys) => {
-        if (keys.length === 0) {
-          return [];
-        }
-        const results = [];
-        keys.forEach((key, index) => {
-          storage.get(key)
-            // eslint-disable-next-line consistent-return
-            .then((value) => {
-              results.push({
-                key,
-                value: value.item,
-                uuid: value.uuid,
+    this.getAllItems = async () => {
+      await storage.keys()
+        // eslint-disable-next-line consistent-return
+        .then((keys) => {
+          if (keys.length === 0) {
+            return [];
+          }
+          const results = [];
+          keys.forEach((key, index) => {
+            storage.get(key)
+              // eslint-disable-next-line consistent-return
+              .then((value) => {
+                results.push({
+                  key,
+                  value: value.item,
+                  uuid: value.uuid,
+                });
+                if (index === keys.length - 1) {
+                  return results;
+                }
+              })
+              .catch((err) => {
+                debug(err.message);
+                return [];
               });
-              if (index === keys.length - 1) {
-                return results;
-              }
-            })
-            .catch((err) => {
-              debug(err.message);
-              return [];
-            });
+          });
+        })
+        .catch((err) => {
+          debug(err.message);
+          return [];
         });
-      })
-      .catch((err) => {
-        debug(err.message);
-        return [];
-      });
-  }
+    };
 
-  getItem(key) {
-    storage.get(key)
-      // eslint-disable-next-line consistent-return
-      .then(value => value.item)
-      .catch((err) => {
-        debug(err.message);
-        return 'NOVAL';
-      });
-  }
-
-  generateItems() {
     const results = this.getAllItems();
     debug(results);
     if (results.length > 0) {
@@ -178,6 +153,28 @@ class HBSOS {
         }
       });
     }
+
+    setTimeout(this.refreshValues, 5000);
+    setInterval(this.refreshValues, 60000);
+    this.startServer();
+  }
+
+  getMotion(callback) {
+    callback(null, MotionState);
+  }
+
+  getServices() {
+    return [MotionService];
+  }
+
+  getItem(key) {
+    storage.get(key)
+      // eslint-disable-next-line consistent-return
+      .then(value => value.item)
+      .catch((err) => {
+        debug(err.message);
+        return 'NOVAL';
+      });
   }
 
   refreshValues() {
