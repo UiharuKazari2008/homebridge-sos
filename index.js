@@ -51,23 +51,25 @@ class HBSOS {
   }
 
   refreshValues() {
-    CustomServer.getAllItems.forEach((object) => {
-      this.motionService
-        .getCharacteristic(() => {
-          const char = new Characteristic(object.key, object.uuid);
+    CustomServer.getAllItems.then((results) => {
+      results.forEach((object) => {
+        this.motionService
+          .getCharacteristic(() => {
+            const char = new Characteristic(object.key, object.uuid);
 
-          char.setProps({
-            format: Characteristic.Formats.UINT8,
-            maxValue: 12,
-            minValue: 1,
-            minStep: 1,
-            perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY],
-          });
-          char.value = object.value;
+            char.setProps({
+              format: Characteristic.Formats.UINT8,
+              maxValue: 12,
+              minValue: 1,
+              minStep: 1,
+              perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY],
+            });
+            char.value = object.value;
 
-          return char;
-        })
-        .updateValue(CustomServer.getItem(object.key));
+            return char;
+          })
+          .updateValue(CustomServer.getItem(object.key));
+      });
     });
     // Set timeout
     setTimeout(
@@ -76,24 +78,26 @@ class HBSOS {
     );
   }
 
-  addCharacteristics() {
-    this.CustomServer.getAllItems.forEach((object) => {
-      this.motionService
-        .addCharacteristic(() => {
-          const char = new Characteristic(object.key, object.uuid);
+  async addCharacteristics() {
+    this.CustomServer.getAllItems.then((results) => {
+      results.forEach((object) => {
+        this.motionService
+          .addCharacteristic(() => {
+            const char = new Characteristic(object.key, object.uuid);
 
-          char.setProps({
-            format: Characteristic.Formats.UINT8,
-            maxValue: 12,
-            minValue: 1,
-            minStep: 1,
-            perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY],
-          });
-          char.value = object.value;
+            char.setProps({
+              format: Characteristic.Formats.UINT8,
+              maxValue: 12,
+              minValue: 1,
+              minStep: 1,
+              perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY],
+            });
+            char.value = object.value;
 
-          return char;
-        })
-        .on('get', callback => callback(null, CustomServer.getItem(object.key)));
+            return char;
+          })
+          .on('get', callback => callback(null, CustomServer.getItem(object.key)));
+      });
     });
   }
 }

@@ -208,44 +208,48 @@ const server = (Options, TLSOpts) => {
     }
   }); */
 
-  const getAllItems = () => {
+  const getAllItems = () => new Promise((resolve) => {
     storage.keys()
       // eslint-disable-next-line consistent-return
       .then((keys) => {
         if (keys.length === 0) {
-          return [];
+          resolve([]);
         }
         const results = [];
         keys.forEach((key, index) => {
           storage.get(key)
             // eslint-disable-next-line consistent-return
             .then((value) => {
-              results.push({ key, value: value.item, uuid: value.uuid });
+              results.push({
+                key,
+                value: value.item,
+                uuid: value.uuid
+              });
               if (index === keys.length - 1) {
-                return results;
+                resolve(results);
               }
             })
             .catch((err) => {
               debug(err.message);
-              return [];
+              resolve([]);
             });
         });
       })
       .catch((err) => {
         debug(err.message);
-        return [];
+        resolve([]);
       });
-  };
+  });
 
-  const getItem = (key) => {
+  const getItem = key => new Promise((resolve) => {
     storage.get(key)
       // eslint-disable-next-line consistent-return
-      .then(value => (value.item))
+      .then(value => resolve(value.item))
       .catch((err) => {
         debug(err.message);
-        return 'NOVAL';
+        resolve('NOVAL');
       });
-  };
+  });
 
   return {
     getAllItems,
