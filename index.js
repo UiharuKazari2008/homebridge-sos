@@ -142,12 +142,10 @@ class HBSOS {
     };
 
     this.triggerMotionEvent = () => {
-      MotionService
-        .getCharacteristic(Characteristic.MotionDetected)
+      Characteristic.MotionDetected
         .updateValue(true);
       setTimeout(() => {
-        MotionService
-          .getCharacteristic(Characteristic.MotionDetected)
+        Characteristic.MotionDetected
           .updateValue(false);
       });
     };
@@ -238,8 +236,7 @@ class HBSOS {
                 console.log(results);
                 if (results && results.content.value.item === req.query.value) {
                   res.status(200).send('OK');
-                  MotionService
-                    .getCharacteristic(Characteristics[uuid])
+                  Characteristics[uuid]
                     .setValue(results.content.value.item);
                   this.triggerMotionEvent();
                   debug(`Save: "${results.content.key}" = "${results.content.value}"`);
