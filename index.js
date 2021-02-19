@@ -98,8 +98,7 @@ class HBSOS {
             char.value = object.value;
 
             this.motionService
-              .getCharacteristic(Characteristics[object.uuid])
-              .setValue(CustomServer.getItem(object.key));
+              .setCharacteristic(Characteristics[object.uuid], CustomServer.getItem(object.key);
           }
         });
       }
