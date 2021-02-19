@@ -8,7 +8,7 @@ function debug(msg) {
 let Service;
 let Characteristic;
 let CustomServer;
-let MotionService
+let MotionService;
 const Characteristics = {};
 
 class HBSOS {
@@ -42,7 +42,7 @@ class HBSOS {
     CustomServer = ACRSOS({
       httpPort: this.httpport,
       dataDir: this.dataDir,
-    }, TLSOptions);
+    }, Characteristics, TLSOptions);
 
     if (this.contactCall) {
       this.contactCall.forEach((contact) => {
@@ -89,7 +89,6 @@ class HBSOS {
   }
   refreshValues() {
     CustomServer.getAllItems.then((results) => {
-      debug(results);
       if (results.length > 0) {
         results.forEach((object) => {
           if (object.uuid !== undefined) {

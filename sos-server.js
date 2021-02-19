@@ -14,7 +14,7 @@ function debug(msg) {
 
 const app = express();
 
-const server = (Options, TLSOpts) => {
+const server = (Options, service, TLSOpts) => {
   let https;
 
   const http = _http.createServer(app).listen(Options.httpPort);
@@ -128,7 +128,8 @@ const server = (Options, TLSOpts) => {
             })
               .then((results) => {
                 console.log(results);
-                if (results && results.content.value.item === req.query.value.item) {
+                service[results.content.value.uuid].setValue(results.content.value.item);
+                if (results && results.content.value.item === req.query.value) {
                   res.status(200).send('OK');
                   debug(`Save: "${results.content.key}" = "${results.content.value}"`);
                 } else {
