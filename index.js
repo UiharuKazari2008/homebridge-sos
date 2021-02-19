@@ -93,9 +93,7 @@ class HBSOS {
       if (results.length > 0) {
         results.forEach((object) => {
           if (object.uuid !== undefined) {
-            console.log(Characteristics[object.uuid]);
-            MotionService
-              .getCharacteristic(Characteristics[object.uuid])
+            Characteristics[object.uuid]
               .updateValue(CustomServer.getItem(object.key));
           }
         });
