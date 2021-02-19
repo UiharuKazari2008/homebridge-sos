@@ -162,12 +162,6 @@ class HBSOS {
         });
     };
 
-    this.setCharValue = (uuid, value) => {
-      MotionService
-        .getCharacteristic(Characteristics[uuid])
-        .setValue(value);
-    };
-
     this.startServer = async () => {
       app.use(express.json({ limit: '5mb' }));
       app.use(express.urlencoded({ extended: true, limit: '5mb' }));
@@ -244,7 +238,9 @@ class HBSOS {
                 console.log(results);
                 if (results && results.content.value.item === req.query.value) {
                   res.status(200).send('OK');
-                  this.setCharValue(uuid, results.content.value.item);
+                  MotionService
+                    .getCharacteristic(Characteristics[uuid])
+                    .setValue(results.content.value.item);
                   this.triggerMotionEvent();
                   debug(`Save: "${results.content.key}" = "${results.content.value}"`);
                 } else {
