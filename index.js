@@ -89,11 +89,8 @@ class HBSOS {
       60000,
     );
   }
-  async getItem(key) {
-    await CustomServer.getItem(key)
-      .then((value) => {
-        return value
-      })
+  getItem(key) {
+    return CustomServer.getItem(key);
   }
 
   async addCharacteristics() {
