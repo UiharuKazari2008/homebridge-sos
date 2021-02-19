@@ -73,7 +73,7 @@ class HBSOS {
       }
     });
 
-    setTimeout(this.refreshValues(), 30000);
+    setTimeout(this.refreshValues, 30000);
   }
 
   getServices() {
