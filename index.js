@@ -93,32 +93,7 @@ class HBSOS {
       });
     }
 
-    this.getAllItems.then((results) => {
-      debug(results);
-      if (results.length > 0) {
-        results.forEach((object) => {
-          if (object.uuid !== undefined) {
-            const char = new Characteristic(object.key, object.uuid);
-
-            char.setProps({
-              format: Characteristic.Formats.STRING,
-              perms: [
-                Characteristic.Perms.READ,
-                Characteristic.Perms.NOTIFY,
-              ],
-            });
-            char.value = object.value;
-
-            Characteristics[object.uuid] = char;
-
-            MotionService
-              .addCharacteristic(Characteristics[object.uuid])
-              .on('get', callback => callback(null, this.getItem(object.key)));
-          }
-        });
-      }
-    });
-
+    this.generateItems();
     setTimeout(this.refreshValues, 5000);
     setInterval(this.refreshValues, 60000);
     this.startServer();
@@ -188,6 +163,34 @@ class HBSOS {
         debug(err.message);
         return 'NOVAL';
       });
+  }
+
+  generateItems() {
+    this.getAllItems.then((results) => {
+      debug(results);
+      if (results.length > 0) {
+        results.forEach((object) => {
+          if (object.uuid !== undefined) {
+            const char = new Characteristic(object.key, object.uuid);
+
+            char.setProps({
+              format: Characteristic.Formats.STRING,
+              perms: [
+                Characteristic.Perms.READ,
+                Characteristic.Perms.NOTIFY,
+              ],
+            });
+            char.value = object.value;
+
+            Characteristics[object.uuid] = char;
+
+            MotionService
+              .addCharacteristic(Characteristics[object.uuid])
+              .on('get', callback => callback(null, this.getItem(object.key)));
+          }
+        });
+      }
+    });
   }
 
   startServer() {
