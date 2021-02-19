@@ -96,7 +96,7 @@ class HBSOS {
 
             this.motionService
               .getCharacteristic(char)
-              .updateValue(CustomServer.getItem(object.key));
+              .setValue(CustomServer.getItem(object.key));
           }
         });
       }
