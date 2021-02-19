@@ -8,6 +8,7 @@ function debug(msg) {
 let Service;
 let Characteristic;
 let CustomServer;
+let Characteristics;
 
 class HBSOS {
   constructor(log, config) {
@@ -65,8 +66,10 @@ class HBSOS {
             });
             char.value = object.value;
 
+            Characteristics[object.uuid] = char;
+
             this.motionService
-              .addCharacteristic(char)
+              .addCharacteristic(Characteristics[object.uuid])
               .on('get', callback => callback(null, CustomServer.getItem(object.key)));
           }
         });
@@ -95,7 +98,7 @@ class HBSOS {
             char.value = object.value;
 
             this.motionService
-              .getCharacteristic(char)
+              .getCharacteristic(Characteristics[object.uuid])
               .setValue(CustomServer.getItem(object.key));
           }
         });
