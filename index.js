@@ -109,10 +109,7 @@ class HBSOS {
                 const char = new Characteristic(object.key, object.uuid);
 
                 char.setProps({
-                  format: Characteristic.Formats.UINT8,
-                  maxValue: 12,
-                  minValue: 1,
-                  minStep: 1,
+                  format: Characteristic.Formats.STRING,
                   perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY],
                 });
                 char.value = object.value;
