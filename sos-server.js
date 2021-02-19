@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-const debug = require('debug')('homebridge-sos');
+//const debug = require('debug')('homebridge-sos');
 const fs = require('fs');
 const storageHandler = require('node-persist');
 const express = require('express');
@@ -7,6 +7,10 @@ const request = require('request').defaults({ encoding: null });
 const _http = require('http');
 const _https = require('https');
 const { v4: uuidv4 } = require('uuid');
+
+function debug(msg) {
+  console.log(msg);
+}
 
 const app = express();
 
