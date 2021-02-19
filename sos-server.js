@@ -121,6 +121,7 @@ const server = (Options, TLSOpts) => {
       storage.getItem(req.query.item)
         .then((originalItem) => {
           if (originalItem !== undefined && originalItem !== 'undefined' && originalItem !== '') {
+            console.log('Has UUID')
             storage.setItem(req.query.item, {
               item: req.query.value,
               uuid: originalItem.uuid,
