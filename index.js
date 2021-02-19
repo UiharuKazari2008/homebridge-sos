@@ -127,7 +127,8 @@ class HBSOS {
           debug(err.message);
           resolve([]);
         });
-      };
+    });
+
     this.refreshValues = () => {
       const results = this.getAllItems();
       if (results.length > 0) {
