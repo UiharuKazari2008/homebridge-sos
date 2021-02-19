@@ -96,40 +96,38 @@ class HBSOS {
       });
     }
 
-    this.getAllItems = () => {
-      return new Promise((resolve) => {
-        storage.keys()
-          // eslint-disable-next-line consistent-return
-          .then((keys) => {
-            if (keys.length === 0) {
-              resolve([]);
-            }
-            const results = [];
-            keys.forEach((key, index) => {
-              storage.get(key)
-                // eslint-disable-next-line consistent-return
-                .then((value) => {
-                  results.push({
-                    key,
-                    value: value.item,
-                    uuid: value.uuid,
-                  });
-                  if (index === keys.length - 1) {
-                    resolve(results);
-                  }
-                })
-                .catch((err) => {
-                  debug(err.message);
-                  resolve([]);
-                });
-            });
-          })
-          .catch((err) => {
-            debug(err.message);
+    this.getAllItems = () => new Promise((resolve) => {
+      storage.keys()
+        // eslint-disable-next-line consistent-return
+        .then((keys) => {
+          if (keys.length === 0) {
             resolve([]);
+          }
+          const results = [];
+          keys.forEach((key, index) => {
+            storage.get(key)
+              // eslint-disable-next-line consistent-return
+              .then((value) => {
+                results.push({
+                  key,
+                  value: value.item,
+                  uuid: value.uuid,
+                });
+                if (index === keys.length - 1) {
+                  resolve(results);
+                }
+              })
+              .catch((err) => {
+                debug(err.message);
+                resolve([]);
+              });
           });
-      });
-    };
+        })
+        .catch((err) => {
+          debug(err.message);
+          resolve([]);
+        });
+      };
     this.refreshValues = () => {
       const results = this.getAllItems();
       if (results.length > 0) {
