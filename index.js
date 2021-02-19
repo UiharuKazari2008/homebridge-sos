@@ -38,13 +38,15 @@ class HBSOS {
       dataDir: this.dataDir,
     }, TLSOptions);
 
-    this.contactCall.forEach((contact) => {
-      const state = CustomServer.getItem(contact);
-      this.service = new Service.ContactSensor(state.key);
-      this.service
-        .getCharacteristic(Characteristic.ContactSensorState)
-        .on('get', () => (state.value === 'Yes' || state.value === '1'));
-    });
+    if (this.contactCall) {
+      this.contactCall.forEach((contact) => {
+        const state = CustomServer.getItem(contact);
+        this.service = new Service.ContactSensor(state.key);
+        this.service
+          .getCharacteristic(Characteristic.ContactSensorState)
+          .on('get', () => (state.value === 'Yes' || state.value === '1'));
+      });
+    }
 
     this.addCharacteristics();
     this.refreshValues();
