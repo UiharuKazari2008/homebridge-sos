@@ -111,24 +111,23 @@ class HBSOS {
   }
 
   refreshValues() {
-    this.getAllItems.then((results) => {
-      if (results.length > 0) {
-        results.forEach((object) => {
-          if (object.uuid !== undefined) {
-            Characteristics[object.uuid]
-              .updateValue(this.getItem(object.key));
-          }
-        });
-      }
-    });
+    const results = this.getAllItems();
+    if (results.length > 0) {
+      results.forEach((object) => {
+        if (object.uuid !== undefined) {
+          Characteristics[object.uuid]
+            .updateValue(this.getItem(object.key));
+        }
+      });
+    }
   }
 
-  getAllItems = new Promise((resolve) => {
-    storage.keys()
+  async getAllItems() {
+    await storage.keys()
       // eslint-disable-next-line consistent-return
       .then((keys) => {
         if (keys.length === 0) {
-          resolve([]);
+          return [];
         }
         const results = [];
         keys.forEach((key, index) => {
@@ -141,20 +140,20 @@ class HBSOS {
                 uuid: value.uuid,
               });
               if (index === keys.length - 1) {
-                resolve(results);
+                return results;
               }
             })
             .catch((err) => {
               debug(err.message);
-              resolve([]);
+              return [];
             });
         });
       })
       .catch((err) => {
         debug(err.message);
-        resolve([]);
+        return [];
       });
-  });
+  }
 
 
   getItem(key) {
@@ -168,31 +167,30 @@ class HBSOS {
   }
 
   generateItems() {
-    this.getAllItems.then((results) => {
-      debug(results);
-      if (results.length > 0) {
-        results.forEach((object) => {
-          if (object.uuid !== undefined) {
-            const char = new Characteristic(object.key, object.uuid);
+    const results = this.getAllItems
+    debug(results);
+    if (results.length > 0) {
+      results.forEach((object) => {
+        if (object.uuid !== undefined) {
+          const char = new Characteristic(object.key, object.uuid);
 
-            char.setProps({
-              format: Characteristic.Formats.STRING,
-              perms: [
-                Characteristic.Perms.READ,
-                Characteristic.Perms.NOTIFY,
-              ],
-            });
-            char.value = object.value;
+          char.setProps({
+            format: Characteristic.Formats.STRING,
+            perms: [
+              Characteristic.Perms.READ,
+              Characteristic.Perms.NOTIFY,
+            ],
+          });
+          char.value = object.value;
 
-            Characteristics[object.uuid] = char;
+          Characteristics[object.uuid] = char;
 
-            MotionService
-              .addCharacteristic(Characteristics[object.uuid])
-              .on('get', callback => callback(null, this.getItem(object.key)));
-          }
-        });
-      }
-    });
+          MotionService
+            .addCharacteristic(Characteristics[object.uuid])
+            .on('get', callback => callback(null, this.getItem(object.key)));
+        }
+      });
+    }
   }
 
   startServer() {
