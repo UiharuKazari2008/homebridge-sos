@@ -110,18 +110,6 @@ class HBSOS {
     return [MotionService];
   }
 
-  refreshValues() {
-    const results = this.getAllItems();
-    if (results.length > 0) {
-      results.forEach((object) => {
-        if (object.uuid !== undefined) {
-          Characteristics[object.uuid]
-            .updateValue(this.getItem(object.key));
-        }
-      });
-    }
-  }
-
   async getAllItems() {
     await storage.keys()
       // eslint-disable-next-line consistent-return
@@ -155,7 +143,6 @@ class HBSOS {
       });
   }
 
-
   getItem(key) {
     storage.get(key)
       // eslint-disable-next-line consistent-return
@@ -167,7 +154,7 @@ class HBSOS {
   }
 
   generateItems() {
-    const results = this.getAllItems
+    const results = this.getAllItems;
     debug(results);
     if (results.length > 0) {
       results.forEach((object) => {
@@ -188,6 +175,18 @@ class HBSOS {
           MotionService
             .addCharacteristic(Characteristics[object.uuid])
             .on('get', callback => callback(null, this.getItem(object.key)));
+        }
+      });
+    }
+  }
+
+  refreshValues() {
+    const results = this.getAllItems();
+    if (results.length > 0) {
+      results.forEach((object) => {
+        if (object.uuid !== undefined) {
+          Characteristics[object.uuid]
+            .updateValue(this.getItem(object.key));
         }
       });
     }
