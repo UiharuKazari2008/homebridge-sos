@@ -14,11 +14,13 @@ const server = (Options, TLSOpts) => {
   let https;
 
   const http = _http.createServer(app).listen(Options.httpPort);
+  debug(`Listening on ${Options.httpPort}`);
   if (TLSOpts && TLSOpts.httpsPort) {
     https = _https.createServer({
       key: fs.readFileSync(TLSOpts.tlsKey),
       cert: fs.readFileSync(TLSOpts.tlsCert),
     }, app).listen(TLSOpts.httpsPort);
+    debug(`Listening on ${TLSOpts.httpsPort}`);
   }
 
   const storage = storageHandler.create({
