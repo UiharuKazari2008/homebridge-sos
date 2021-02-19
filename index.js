@@ -63,7 +63,11 @@ class HBSOS {
 
             char.setProps({
               format: Characteristic.Formats.STRING,
-              perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY],
+              perms: [
+                Characteristic.Perms.READ,
+                Characteristic.Perms.WRITE,
+                Characteristic.Perms.NOTIFY,
+              ],
             });
             char.value = object.value;
 
@@ -91,7 +95,8 @@ class HBSOS {
         results.forEach((object) => {
           if (object.uuid !== undefined) {
             MotionService
-              .setCharacteristic(Characteristics[object.uuid], CustomServer.getItem(object.key))
+              .getCharacteristic(Characteristics[object.uuid])
+              .updateValue(CustomServer.getItem(object.key));
           }
         });
       }
