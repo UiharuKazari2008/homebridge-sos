@@ -128,6 +128,17 @@ class HBSOS {
           return [];
         });
     };
+    this.refreshValues = () => {
+      const results = this.getAllItems();
+      if (results.length > 0) {
+        results.forEach((object) => {
+          if (object.uuid !== undefined) {
+            Characteristics[object.uuid]
+              .updateValue(this.getItem(object.key));
+          }
+        });
+      }
+    }
 
     const results = this.getAllItems();
     debug(results);
@@ -175,18 +186,6 @@ class HBSOS {
         debug(err.message);
         return 'NOVAL';
       });
-  }
-
-  refreshValues() {
-    const results = this.getAllItems();
-    if (results.length > 0) {
-      results.forEach((object) => {
-        if (object.uuid !== undefined) {
-          Characteristics[object.uuid]
-            .updateValue(this.getItem(object.key));
-        }
-      });
-    }
   }
 
   startServer() {
