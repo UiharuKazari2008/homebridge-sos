@@ -80,7 +80,7 @@ class HBSOS {
 
     MotionService = new Service.MotionSensor(this.name);
     MotionService
-      .getCharacteristic(Characteristic.MotionDetecte)
+      .getCharacteristic(Characteristic.MotionDetected)
       .on('get', this.getMotion.bind(this));
 
 
