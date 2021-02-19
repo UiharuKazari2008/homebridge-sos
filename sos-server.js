@@ -112,10 +112,10 @@ const server = (Options, TLSOpts) => {
         debug(err);
       });
   });
-  app.get('/set', (req, res) => {
+  app.get('/set', async (req, res) => {
     if (req.query.item !== undefined && req.query.value !== undefined && req.query.item !== '' && req.query.value !== '') {
       let uuid;
-      storage.getItem(req.query.item)
+      await storage.getItem(req.query.item)
         .then((results) => {
           if (results !== undefined && results !== 'undefined' && results !== '') {
             uuid = results.uuid;
