@@ -16,7 +16,6 @@ function debug(msg) {
 
 let Service;
 let Characteristic;
-let CustomServer;
 let MotionService;
 let MotionState = false;
 let storage;
@@ -134,7 +133,7 @@ class HBSOS {
   }
 
   refreshValues() {
-    CustomServer.getAllItems.then((results) => {
+    this.getAllItems.then((results) => {
       if (results.length > 0) {
         results.forEach((object) => {
           if (object.uuid !== undefined) {
