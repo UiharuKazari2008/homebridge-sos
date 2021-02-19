@@ -181,7 +181,7 @@ class HBSOS {
   }
 
   refreshValues() {
-    const results = this.getAllItems();
+    const results = this.getAllItems;
     if (results.length > 0) {
       results.forEach((object) => {
         if (object.uuid !== undefined) {
