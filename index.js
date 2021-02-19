@@ -150,7 +150,7 @@ class HBSOS {
         MotionService
           .getCharacteristic(Characteristic.MotionDetected)
           .updateValue(false);
-      });
+      }, 1000);
     };
 
     this.getItem = (key) => {
