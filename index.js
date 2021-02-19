@@ -88,7 +88,7 @@ class HBSOS {
 
   async addCharacteristics() {
     CustomServer.getAllItems.then((results) => {
-      debug(results);
+      console.log(results);
       if (results.length > 0) {
         results.forEach((object) => {
           this.motionService
