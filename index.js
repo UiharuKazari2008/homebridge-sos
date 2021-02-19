@@ -52,6 +52,9 @@ class HBSOS {
     this.refreshValues();
   }
 
+  getServices() {
+    return [this.motionService];
+  }
   refreshValues() {
     CustomServer.getAllItems.then((results) => {
       debug(results);
@@ -115,8 +118,4 @@ module.exports = (homebridge) => {
   Characteristic = homebridge.hap.Characteristic; // eslint-disable-line
 
   homebridge.registerAccessory('homebridge-sos', 'ACRSOS', HBSOS);
-};
-// eslint-disable-next-line func-names
-HBSOS.prototype.getServices = function() {
-  return [this.motionService];
 };
