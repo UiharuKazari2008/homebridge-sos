@@ -76,7 +76,7 @@ class HBSOS {
       }
     });
 
-    this.refreshValues();
+    setTimeout(this.refreshValues, 5000);
     setInterval(this.refreshValues, 60000);
   }
 
