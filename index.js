@@ -78,7 +78,7 @@ class HBSOS {
 
             this.motionService
               .getCharacteristic(char)
-              .updateValue(this.getItem(object.key));
+              .updateValue(CustomServer.getItem(object.key));
           }
         });
       }
@@ -88,9 +88,6 @@ class HBSOS {
       this.refreshValues.bind(this),
       60000,
     );
-  }
-  getItem(key) {
-    return CustomServer.getItem(key);
   }
 
   async addCharacteristics() {
@@ -109,7 +106,7 @@ class HBSOS {
 
             this.motionService
               .addCharacteristic(char)
-              .on('get', callback => callback(null, this.getItem(object.key)));
+              .on('get', callback => callback(null, CustomServer.getItem(object.key)));
           }
         });
       }
