@@ -36,7 +36,8 @@ class HBSOS {
 
     this.contactCall = config.contactCall;
 
-    this.http = _http.createServer(app).listen(this.httpPort);
+    this.http = _http.createServer(app)
+      .listen(this.httpPort);
     debug(`Listening on ${this.httpPort}`);
 
     this.https = undefined;
@@ -45,7 +46,8 @@ class HBSOS {
       this.https = _https.createServer({
         key: fs.readFileSync(this.tlsKey),
         cert: fs.readFileSync(this.tlsCert),
-      }, app).listen(this.tlsPort);
+      }, app)
+        .listen(this.tlsPort);
       debug(`Listening on ${this.tlsPort}`);
     }
 
@@ -59,23 +61,24 @@ class HBSOS {
       expiredInterval: 2 * 60 * 1000, // every 2 minutes the process will clean-up the expired cache
       forgiveParseErrors: true,
     });
-    storage.init().then((res) => {
-      debug(`Initialized successfully the Local parameters storage @ ${res.dir}`);
-      storage.keys()
-        .then((keys) => {
-          debug('Values in storage:');
-          keys.forEach((key) => {
-            storage.get(key)
-              .then((value) => {
-                debug(`"${key}" = "${value}"`);
-              })
-              // eslint-disable-next-line no-unused-vars
-              .catch((err) => {
-                debug(`Could not read ${key}'s value!`);
-              });
+    storage.init()
+      .then((res) => {
+        debug(`Initialized successfully the Local parameters storage @ ${res.dir}`);
+        storage.keys()
+          .then((keys) => {
+            debug('Values in storage:');
+            keys.forEach((key) => {
+              storage.get(key)
+                .then((value) => {
+                  debug(`"${key}" = "${value}"`);
+                })
+                // eslint-disable-next-line no-unused-vars
+                .catch((err) => {
+                  debug(`Could not read ${key}'s value!`);
+                });
+            });
           });
-        });
-    });
+      });
 
     MotionService = new Service.MotionSensor(this.name);
     MotionService
@@ -120,40 +123,39 @@ class HBSOS {
     });
   }
 
-  getAllItems() {
-    return new Promise((resolve) => {
-      storage.keys()
-        // eslint-disable-next-line consistent-return
-        .then((keys) => {
-          if (keys.length === 0) {
-            resolve([]);
-          }
-          const results = [];
-          keys.forEach((key, index) => {
-            storage.get(key)
-              // eslint-disable-next-line consistent-return
-              .then((value) => {
-                results.push({
-                  key,
-                  value: value.item,
-                  uuid: value.uuid,
-                });
-                if (index === keys.length - 1) {
-                  resolve(results);
-                }
-              })
-              .catch((err) => {
-                debug(err.message);
-                resolve([]);
-              });
-          });
-        })
-        .catch((err) => {
-          debug(err.message);
+  getAllItems = new Promise((resolve) => {
+    storage.keys()
+      // eslint-disable-next-line consistent-return
+      .then((keys) => {
+        if (keys.length === 0) {
           resolve([]);
+        }
+        const results = [];
+        keys.forEach((key, index) => {
+          storage.get(key)
+            // eslint-disable-next-line consistent-return
+            .then((value) => {
+              results.push({
+                key,
+                value: value.item,
+                uuid: value.uuid,
+              });
+              if (index === keys.length - 1) {
+                resolve(results);
+              }
+            })
+            .catch((err) => {
+              debug(err.message);
+              resolve([]);
+            });
         });
-    });
-  }
+      })
+      .catch((err) => {
+        debug(err.message);
+        resolve([]);
+      });
+  });
+
 
   getItem(key) {
     storage.get(key)
