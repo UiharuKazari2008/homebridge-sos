@@ -126,6 +126,7 @@ const server = (Options, TLSOpts) => {
               uuid: originalItem.uuid,
             })
               .then((results) => {
+                console.log(results);
                 if (results && results.content.value === req.query.value) {
                   res.status(200).send('OK');
                   debug(`Save: "${results.content.key}" = "${results.content.value}"`);
@@ -145,6 +146,7 @@ const server = (Options, TLSOpts) => {
               uuid: uuidv4(),
             })
               .then((results) => {
+                console.log(results);
                 if (results && results.content.value === req.query.value) {
                   res.status(200).send('OK');
                   debug(`Save: "${results.content.key}" = "${results.content.value}"`);
