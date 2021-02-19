@@ -33,14 +33,14 @@ class HBSOS {
 
     this.motionService = new Service.MotionSensor(this.name);
 
-    this.CustomServer = ACRSOS({
+    CustomServer = ACRSOS({
       httpPort: this.httpport,
       dataDir: this.dataDir,
     }, TLSOptions);
 
     if (this.contactCall) {
       this.contactCall.forEach((contact) => {
-        const state = this.CustomServer.getItem(contact);
+        const state = CustomServer.getItem(contact);
         this.service = new Service.ContactSensor(state.key);
         this.service
           .getCharacteristic(Characteristic.ContactSensorState)
@@ -53,7 +53,7 @@ class HBSOS {
   }
 
   refreshValues() {
-    this.CustomServer.getAllItems.then((results) => {
+    CustomServer.getAllItems.then((results) => {
       debug(results);
       if (results.length > 0) {
         results.forEach((object) => {
@@ -72,7 +72,7 @@ class HBSOS {
 
               return char;
             })
-            .updateValue(this.CustomServer.getItem(object.key));
+            .updateValue(CustomServer.getItem(object.key));
         });
       }
     });
@@ -84,7 +84,7 @@ class HBSOS {
   }
 
   async addCharacteristics() {
-    this.CustomServer.getAllItems.then((results) => {
+    CustomServer.getAllItems.then((results) => {
       debug(results);
       if (results.length > 0) {
         results.forEach((object) => {
@@ -103,7 +103,7 @@ class HBSOS {
 
               return char;
             })
-            .on('get', callback => callback(null, this.CustomServer.getItem(object.key)));
+            .on('get', callback => callback(null, CustomServer.getItem(object.key)));
         });
       }
     });
