@@ -8,6 +8,7 @@ function debug(msg) {
 let Service;
 let Characteristic;
 let CustomServer;
+let MotionService
 const Characteristics = {};
 
 class HBSOS {
@@ -37,6 +38,7 @@ class HBSOS {
     }
 
     this.motionService = new Service.MotionSensor(this.name);
+    MotionService = this.motionService;
 
     CustomServer = ACRSOS({
       httpPort: this.httpport,
