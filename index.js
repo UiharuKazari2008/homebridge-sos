@@ -94,7 +94,7 @@ class HBSOS {
       });
     }
 
-    CustomServer.getAllItems.then((results) => {
+    this.getAllItems.then((results) => {
       debug(results);
       if (results.length > 0) {
         results.forEach((object) => {
