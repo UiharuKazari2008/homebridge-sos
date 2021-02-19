@@ -128,6 +128,8 @@ const server = (Options, service, TLSOpts) => {
             if (results && results.content.value.item === req.query.value) {
               res.status(200).send('OK');
               service[uuid].setValue(results.content.value.item);
+              service.MotionDetected.setValue(true);
+              setTimeout(() => { service.MotionDetected.setValue(false); }, 500);
               debug(`Save: "${results.content.key}" = "${results.content.value}"`);
             } else {
               res.status(500).send('SAVE_FAILED');

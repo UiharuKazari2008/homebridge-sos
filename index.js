@@ -9,6 +9,7 @@ let Service;
 let Characteristic;
 let CustomServer;
 let MotionService;
+let MotionState = false;
 const Characteristics = {};
 
 class HBSOS {
@@ -53,6 +54,11 @@ class HBSOS {
           .on('get', () => (state.value === 'Yes' || state.value === '1'));
       });
     }
+
+    Characteristics.MotionDetected = Characteristic.MotionDetected;
+    MotionService
+      .addCharacteristic(Characteristics.MotionDetected)
+      .on('get', callback => callback(null, () => MotionState));
 
     CustomServer.getAllItems.then((results) => {
       debug(results);
