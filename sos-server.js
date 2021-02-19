@@ -128,7 +128,7 @@ const server = (Options, service, TLSOpts) => {
         });
       storage.setItem(req.query.item, {
         item: req.query.value,
-        uuid: uuid,
+        uuid,
       })
         .then((results) => {
           console.log(results);
