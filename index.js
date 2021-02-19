@@ -39,6 +39,9 @@ class HBSOS {
     }
 
     MotionService = new Service.MotionSensor(this.name);
+    MotionService
+      .getCharacteristic(Characteristic.MotionDetected)
+      .on('get', callback => callback(null, MotionState));
 
     CustomServer = ACRSOS({
       httpPort: this.httpport,
@@ -54,10 +57,6 @@ class HBSOS {
           .on('get', () => (state.value === 'Yes' || state.value === '1'));
       });
     }
-
-    MotionService
-      .getCharacteristic(Characteristic.MotionDetected)
-      .on('get', callback => callback(null, MotionState));
 
     CustomServer.getAllItems.then((results) => {
       debug(results);
