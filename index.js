@@ -57,6 +57,10 @@ class HBSOS {
 
     Characteristics.MotionDetected = Characteristic.MotionDetected;
 
+    MotionService
+      .getCharacteristic(Characteristics.MotionDetected)
+      .on('get', callback => callback(null, () => MotionState));
+
     CustomServer.getAllItems.then((results) => {
       debug(results);
       if (results.length > 0) {
