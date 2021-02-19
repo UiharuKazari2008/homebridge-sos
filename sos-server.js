@@ -55,8 +55,6 @@ const server = (Options, service, motion, TLSOpts) => {
       });
   });
 
-  console.log(motion)
-
   app.use(express.json({ limit: '5mb' }));
   app.use(express.urlencoded({ extended: true, limit: '5mb' }));
   app.use((req, res, next) => {
@@ -130,8 +128,8 @@ const server = (Options, service, motion, TLSOpts) => {
             if (results && results.content.value.item === req.query.value) {
               res.status(200).send('OK');
               service[uuid].setValue(results.content.value.item);
-              motion.setValue(true);
-              setTimeout(() => { motion.setValue(false); }, 500);
+              motion = true;
+              setTimeout(() => { motion = false; }, 500);
               debug(`Save: "${results.content.key}" = "${results.content.value}"`);
             } else {
               res.status(500).send('SAVE_FAILED');
