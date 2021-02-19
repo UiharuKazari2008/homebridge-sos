@@ -118,32 +118,47 @@ const server = (Options, TLSOpts) => {
   });
   app.get('/set', async (req, res) => {
     if (req.query.item !== undefined && req.query.value !== undefined && req.query.item !== '' && req.query.value !== '') {
-      let uuid;
-      await storage.getItem(req.query.item)
+      storage.getItem(req.query.item)
         .then((results) => {
           if (results !== undefined && results !== 'undefined' && results !== '') {
-            uuid = results.uuid;
+            storage.setItem(req.query.item, {
+              item: req.query.value,
+              uuid: results.uuid,
+            })
+              .then((results) => {
+                if (results && results.content.value === req.query.value) {
+                  res.status(200).send('OK');
+                  debug(`Save: "${results.content.key}" = "${results.content.value}"`);
+                } else {
+                  res.status(500).send('SAVE_FAILED');
+                  debug(`Save Error: "${req.query.item}" did not save correctly`);
+                }
+              })
+              .catch((err) => {
+                res.status(500).send();
+                debug(`Save Error: "${req.query.item}" = "${req.query.value}"`);
+                debug(err);
+              });
           } else {
-            uuid = uuidv4();
+            storage.setItem(req.query.item, {
+              item: req.query.value,
+              uuid: uuidv4(),
+            })
+              .then((results) => {
+                if (results && results.content.value === req.query.value) {
+                  res.status(200).send('OK');
+                  debug(`Save: "${results.content.key}" = "${results.content.value}"`);
+                } else {
+                  res.status(500).send('SAVE_FAILED');
+                  debug(`Save Error: "${req.query.item}" did not save correctly`);
+                }
+              })
+              .catch((err) => {
+                res.status(500).send();
+                debug(`Save Error: "${req.query.item}" = "${req.query.value}"`);
+                debug(err);
+              });
           }
-        });
-      storage.setItem(req.query.item, {
-        item: req.query.value,
-        uuid,
-      })
-        .then((results) => {
-          if (results && results.content.value === req.query.value) {
-            res.status(200).send('OK');
-            debug(`Save: "${results.content.key}" = "${results.content.value}"`);
-          } else {
-            res.status(500).send('SAVE_FAILED');
-            debug(`Save Error: "${req.query.item}" did not save correctly`);
-          }
-        })
-        .catch((err) => {
-          res.status(500).send();
-          debug(`Save Error: "${req.query.item}" = "${req.query.value}"`);
-          debug(err);
         });
     } else {
       res.status(500).send('INVALID_REQUEST');
