@@ -40,7 +40,7 @@ class HBSOS {
 
     if (this.contactCall) {
       this.contactCall.forEach((contact) => {
-        const state = CustomServer.getItem(contact);
+        const state = this.CustomServer.getItem(contact);
         this.service = new Service.ContactSensor(state.key);
         this.service
           .getCharacteristic(Characteristic.ContactSensorState)
@@ -53,7 +53,7 @@ class HBSOS {
   }
 
   refreshValues() {
-    CustomServer.getAllItems.then((results) => {
+    this.CustomServer.getAllItems.then((results) => {
       debug(results);
       if (results.length > 0) {
         results.forEach((object) => {
@@ -72,7 +72,7 @@ class HBSOS {
 
               return char;
             })
-            .updateValue(CustomServer.getItem(object.key));
+            .updateValue(this.CustomServer.getItem(object.key));
         });
       }
     });
@@ -103,7 +103,7 @@ class HBSOS {
 
               return char;
             })
-            .on('get', callback => callback(null, CustomServer.getItem(object.key)));
+            .on('get', callback => callback(null, this.CustomServer.getItem(object.key)));
         });
       }
     });
