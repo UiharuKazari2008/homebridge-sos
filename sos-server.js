@@ -210,7 +210,7 @@ const server = (Options, TLSOpts) => {
     }
   }); */
 
-  const getAllItems = () => new Promise((resolve) => {
+  const getAllItems = new Promise((resolve) => {
     storage.keys()
       // eslint-disable-next-line consistent-return
       .then((keys) => {

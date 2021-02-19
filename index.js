@@ -33,7 +33,7 @@ class HBSOS {
 
     this.motionService = new Service.MotionSensor(this.name);
 
-    CustomServer = ACRSOS({
+    CustomServer = new ACRSOS({
       httpPort: this.httpport,
       dataDir: this.dataDir,
     }, TLSOptions);
