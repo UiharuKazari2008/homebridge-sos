@@ -80,7 +80,7 @@ class HBSOS {
 
                 return char;
               })
-              .updateValue(CustomServer.getItem(object.key));
+              .updateValue(this.getItem(object.key));
           }
         });
       }
@@ -90,6 +90,12 @@ class HBSOS {
       this.refreshValues.bind(this),
       60000,
     );
+  }
+  async getItem(key) {
+    await CustomServer.getItem(key)
+      .then((value) => {
+        return value
+      })
   }
 
   async addCharacteristics() {
@@ -113,7 +119,7 @@ class HBSOS {
 
                 return char;
               })
-              .on('get', callback => callback(null, CustomServer.getItem(object.key)));
+              .on('get', callback => callback(null, this.getItem(object.key)));
           }
         });
       }
