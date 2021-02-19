@@ -115,5 +115,5 @@ module.exports = (homebridge) => {
   Service = homebridge.hap.Service; // eslint-disable-line
   Characteristic = homebridge.hap.Characteristic; // eslint-disable-line
 
-  homebridge.registerAccessory('homebridge-sos', HBSOS);
+  homebridge.registerAccessory('ACRSOS', HBSOS);
 };
