@@ -151,10 +151,151 @@ class HBSOS {
       });
     };
 
+    this.getItem = (key) => {
+      storage.get(key)
+        // eslint-disable-next-line consistent-return
+        .then(value => value.item)
+        .catch((err) => {
+          debug(err.message);
+          return 'NOVAL';
+        });
+    };
+
     this.setItem = (uuid, value) => {
       MotionService
         .getCharacteristic(Characteristics[uuid])
         .setValue(value);
+    };
+
+    this.startServer = () => {
+      app.use(express.json({ limit: '5mb' }));
+      app.use(express.urlencoded({ extended: true, limit: '5mb' }));
+      app.use((req, res, next) => {
+        res.header('Access-Control-Allow-Origin', '*'); // update to match the domain you will make the request from
+        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, X-WSS-Key, X-API-Key, X-User-Agent, User-Agent');
+        next();
+      });
+
+      app.get('/', (req, res) => {
+        res.status(200).send('<b>Lizumi storage API v1.2</b>');
+      });
+      app.get('/get', (req, res) => {
+        if (req.query.item !== undefined && req.query.item !== '') {
+          storage.getItem(req.query.item)
+            .then((results) => {
+              if (results && results !== 'undefined' && results !== '') {
+                res.status(200).send(results);
+                debug(`Request: "${req.query.item}" = "${results}"`);
+              } else {
+                res.status(404).send('NOT_FOUND');
+                debug(`Request Error: "${req.query.item}" does not exist yet`);
+              }
+            })
+            .catch((err) => {
+              res.status(500).send();
+              debug(`Request Error: "${req.query.item}"`);
+              debug(err);
+            });
+        } else {
+          res.status(500).send('INVALID_REQUEST');
+          debug('Request Error missing query!');
+        }
+      });
+      app.get('/all', (req, res) => {
+        storage.keys()
+          .then((keys) => {
+            if (keys.length === 0) {
+              res.status(404).send('EMPTY');
+              debug('Request Error: There are no items in storage');
+            } else {
+              const results = [];
+              keys.forEach((key, index) => {
+                storage.get(key)
+                  .then((value) => {
+                    results.push({ key, value });
+                    if (index === keys.length - 1) {
+                      res.status(200).send(results);
+                      debug(results);
+                    }
+                  })
+                  // eslint-disable-next-line no-unused-vars
+                  .catch((err) => {
+                    debug(`Could not read ${key}'s value!`);
+                  });
+              });
+            }
+          })
+          .catch((err) => {
+            res.status(500).send();
+            debug('Request Error:');
+            debug(err);
+          });
+      });
+      app.get('/set', async (req, res) => {
+        if (req.query.item !== undefined && req.query.value !== undefined && req.query.item !== '' && req.query.value !== '') {
+          // eslint-disable-next-line no-inner-declarations
+          function writeItem(uuid) {
+            storage.setItem(req.query.item, {
+              item: req.query.value,
+              uuid,
+            })
+              .then((results) => {
+                console.log(results);
+                if (results && results.content.value.item === req.query.value) {
+                  res.status(200).send('OK');
+                  this.setItem(uuid, results.content.value.item);
+                  this.triggerMotionEvent();
+                  debug(`Save: "${results.content.key}" = "${results.content.value}"`);
+                } else {
+                  res.status(500).send('SAVE_FAILED');
+                  debug(`Save Error: "${req.query.item}" did not save correctly`);
+                }
+              })
+              .catch((err) => {
+                res.status(500).send();
+                debug(`Save Error: "${req.query.item}" = "${req.query.value}"`);
+                debug(err);
+              });
+          }
+
+          storage.getItem(req.query.item)
+            .then((originalItem) => {
+              if (originalItem !== undefined && originalItem !== 'undefined' && originalItem !== '' && originalItem.uuid !== undefined) {
+                writeItem(originalItem.uuid);
+              } else {
+                writeItem(uuidv4());
+              }
+            });
+        } else {
+          res.status(500).send('INVALID_REQUEST');
+          debug('Save Error missing query or value!');
+        }
+      });
+      app.get('/del', (req, res) => {
+        if (req.query.item !== undefined && req.query.item !== '') {
+          storage.removeItem(req.query.item)
+            .then((results) => {
+              if (results && results.removed) {
+                res.status(200).send('OK');
+                debug(results);
+              } else if (results && results.existed === false) {
+                res.status(200).send('OK');
+                debug(results);
+              } else {
+                res.status(500).send('DELETE_FAILED');
+                debug(`Delete Error: "${req.query.item}" was not removed`);
+              }
+            })
+            .catch((err) => {
+              res.status(500).send();
+              debug(`Delete Error: "${req.query.item}" = "${req.query.value}"`);
+              debug(err);
+            });
+        } else {
+          res.status(500).send('INVALID_REQUEST');
+          debug('Delete Error missing query!');
+        }
+      });
     };
 
     const results = this.getAllItems();
@@ -193,147 +334,6 @@ class HBSOS {
 
   getServices() {
     return [MotionService];
-  }
-
-  getItem(key) {
-    storage.get(key)
-      // eslint-disable-next-line consistent-return
-      .then(value => value.item)
-      .catch((err) => {
-        debug(err.message);
-        return 'NOVAL';
-      });
-  }
-
-  startServer() {
-    app.use(express.json({ limit: '5mb' }));
-    app.use(express.urlencoded({ extended: true, limit: '5mb' }));
-    app.use((req, res, next) => {
-      res.header('Access-Control-Allow-Origin', '*'); // update to match the domain you will make the request from
-      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, X-WSS-Key, X-API-Key, X-User-Agent, User-Agent');
-      next();
-    });
-
-    app.get('/', (req, res) => {
-      res.status(200).send('<b>Lizumi storage API v1.2</b>');
-    });
-    app.get('/get', (req, res) => {
-      if (req.query.item !== undefined && req.query.item !== '') {
-        storage.getItem(req.query.item)
-          .then((results) => {
-            if (results && results !== 'undefined' && results !== '') {
-              res.status(200).send(results);
-              debug(`Request: "${req.query.item}" = "${results}"`);
-            } else {
-              res.status(404).send('NOT_FOUND');
-              debug(`Request Error: "${req.query.item}" does not exist yet`);
-            }
-          })
-          .catch((err) => {
-            res.status(500).send();
-            debug(`Request Error: "${req.query.item}"`);
-            debug(err);
-          });
-      } else {
-        res.status(500).send('INVALID_REQUEST');
-        debug('Request Error missing query!');
-      }
-    });
-    app.get('/all', (req, res) => {
-      storage.keys()
-        .then((keys) => {
-          if (keys.length === 0) {
-            res.status(404).send('EMPTY');
-            debug('Request Error: There are no items in storage');
-          } else {
-            const results = [];
-            keys.forEach((key, index) => {
-              storage.get(key)
-                .then((value) => {
-                  results.push({ key, value });
-                  if (index === keys.length - 1) {
-                    res.status(200).send(results);
-                    debug(results);
-                  }
-                })
-                // eslint-disable-next-line no-unused-vars
-                .catch((err) => {
-                  debug(`Could not read ${key}'s value!`);
-                });
-            });
-          }
-        })
-        .catch((err) => {
-          res.status(500).send();
-          debug('Request Error:');
-          debug(err);
-        });
-    });
-    app.get('/set', async (req, res) => {
-      if (req.query.item !== undefined && req.query.value !== undefined && req.query.item !== '' && req.query.value !== '') {
-        // eslint-disable-next-line no-inner-declarations
-        function writeItem(uuid) {
-          storage.setItem(req.query.item, {
-            item: req.query.value,
-            uuid,
-          })
-            .then((results) => {
-              console.log(results);
-              if (results && results.content.value.item === req.query.value) {
-                res.status(200).send('OK');
-                this.setItem(uuid, results.content.value.item);
-                this.triggerMotionEvent();
-                debug(`Save: "${results.content.key}" = "${results.content.value}"`);
-              } else {
-                res.status(500).send('SAVE_FAILED');
-                debug(`Save Error: "${req.query.item}" did not save correctly`);
-              }
-            })
-            .catch((err) => {
-              res.status(500).send();
-              debug(`Save Error: "${req.query.item}" = "${req.query.value}"`);
-              debug(err);
-            });
-        }
-
-        storage.getItem(req.query.item)
-          .then((originalItem) => {
-            if (originalItem !== undefined && originalItem !== 'undefined' && originalItem !== '' && originalItem.uuid !== undefined) {
-              writeItem(originalItem.uuid);
-            } else {
-              writeItem(uuidv4());
-            }
-          });
-      } else {
-        res.status(500).send('INVALID_REQUEST');
-        debug('Save Error missing query or value!');
-      }
-    });
-    app.get('/del', (req, res) => {
-      if (req.query.item !== undefined && req.query.item !== '') {
-        storage.removeItem(req.query.item)
-          .then((results) => {
-            if (results && results.removed) {
-              res.status(200).send('OK');
-              debug(results);
-            } else if (results && results.existed === false) {
-              res.status(200).send('OK');
-              debug(results);
-            } else {
-              res.status(500).send('DELETE_FAILED');
-              debug(`Delete Error: "${req.query.item}" was not removed`);
-            }
-          })
-          .catch((err) => {
-            res.status(500).send();
-            debug(`Delete Error: "${req.query.item}" = "${req.query.value}"`);
-            debug(err);
-          });
-      } else {
-        res.status(500).send('INVALID_REQUEST');
-        debug('Delete Error missing query!');
-      }
-    });
   }
 }
 
