@@ -265,13 +265,9 @@ class HBSOS {
               if (results && results.content.value.item === req.query.value) {
                 res.status(200).send('OK');
                 Characteristics[uuid].setValue(results.content.value.item);
-                MotionService
-                  .getCharacteristic(Characteristic.MotionDetected)
-                  .updateValue(true);
+                Characteristic.MotionDetected.updateValue(true);
                 setTimeout(() => {
-                  MotionService
-                    .getCharacteristic(Characteristic.MotionDetected)
-                    .updateValue(false);
+                  Characteristic.MotionDetected.updateValue(false);
                 }, 500);
                 debug(`Save: "${results.content.key}" = "${results.content.value}"`);
               } else {
