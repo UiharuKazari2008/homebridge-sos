@@ -141,6 +141,15 @@ class HBSOS {
       }
     };
 
+    this.triggerMotionEvent = () => {
+      Characteristic.MotionDetected
+        .setValue(true);
+      setTimeout(() => {
+        Characteristic.MotionDetected
+          .setValue(false);
+      });
+    };
+
     this.getItem = (key) => {
       storage.get(key)
         // eslint-disable-next-line consistent-return
@@ -229,12 +238,7 @@ class HBSOS {
                   res.status(200).send('OK');
                   Characteristics[uuid]
                     .setValue(results.content.value.item);
-                  Characteristic.MotionDetected
-                    .updateValue(true);
-                  setTimeout(() => {
-                    Characteristic.MotionDetected
-                      .updateValue(false);
-                  });
+                  this.triggerMotionEvent();
                   debug(`Save: "${results.content.key}" = "${results.content.value}"`);
                 } else {
                   res.status(500).send('SAVE_FAILED');
