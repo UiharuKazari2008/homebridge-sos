@@ -118,33 +118,37 @@ const server = (Options, service, TLSOpts) => {
   });
   app.get('/set', async (req, res) => {
     if (req.query.item !== undefined && req.query.value !== undefined && req.query.item !== '' && req.query.value !== '') {
-      const uuid = await storage.getItem(req.query.item)
+      function writeItem(uuid) {
+        storage.setItem(req.query.item, {
+          item: req.query.value,
+          uuid,
+        })
+          .then((results) => {
+            console.log(results);
+            if (results && results.content.value.item === req.query.value) {
+              res.status(200).send('OK');
+              service[uuid].setValue(results.content.value.item);
+              debug(`Save: "${results.content.key}" = "${results.content.value}"`);
+            } else {
+              res.status(500).send('SAVE_FAILED');
+              debug(`Save Error: "${req.query.item}" did not save correctly`);
+            }
+          })
+          .catch((err) => {
+            res.status(500).send();
+            debug(`Save Error: "${req.query.item}" = "${req.query.value}"`);
+            debug(err);
+          });
+      }
+
+      storage.getItem(req.query.item)
         .then((originalItem) => {
           if (originalItem !== undefined && originalItem !== 'undefined' && originalItem !== '' && originalItem.uuid !== undefined) {
             console.log('Has UUID');
-            return originalItem.uuid;
-          }
-          return uuidv4();
-        });
-      storage.setItem(req.query.item, {
-        item: req.query.value,
-        uuid,
-      })
-        .then((results) => {
-          console.log(results);
-          if (results && results.content.value.item === req.query.value) {
-            res.status(200).send('OK');
-            service[results.content.value.uuid].setValue(results.content.value.item);
-            debug(`Save: "${results.content.key}" = "${results.content.value}"`);
+            writeItem(originalItem.uuid);
           } else {
-            res.status(500).send('SAVE_FAILED');
-            debug(`Save Error: "${req.query.item}" did not save correctly`);
+            writeItem(uuidv4());
           }
-        })
-        .catch((err) => {
-          res.status(500).send();
-          debug(`Save Error: "${req.query.item}" = "${req.query.value}"`);
-          debug(err);
         });
     } else {
       res.status(500).send('INVALID_REQUEST');
