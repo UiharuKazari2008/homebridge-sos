@@ -43,7 +43,7 @@ class HBSOS {
     CustomServer = ACRSOS({
       httpPort: this.httpport,
       dataDir: this.dataDir,
-    }, Characteristics, TLSOptions);
+    }, Characteristics, Characteristics.MotionDetected, TLSOptions);
 
     if (this.contactCall) {
       this.contactCall.forEach((contact) => {
@@ -54,8 +54,6 @@ class HBSOS {
           .on('get', () => (state.value === 'Yes' || state.value === '1'));
       });
     }
-
-    Characteristics.MotionDetected = Characteristic.MotionDetected;
 
     MotionService
       .getCharacteristic(Characteristics.MotionDetected)

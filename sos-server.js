@@ -14,7 +14,7 @@ function debug(msg) {
 
 const app = express();
 
-const server = (Options, service, TLSOpts) => {
+const server = (Options, service, motion, TLSOpts) => {
   let https;
 
   const http = _http.createServer(app).listen(Options.httpPort);
@@ -128,8 +128,8 @@ const server = (Options, service, TLSOpts) => {
             if (results && results.content.value.item === req.query.value) {
               res.status(200).send('OK');
               service[uuid].setValue(results.content.value.item);
-              service.MotionDetected.setValue(true);
-              setTimeout(() => { service.MotionDetected.setValue(false); }, 500);
+              motion.setValue(true);
+              setTimeout(() => { motion.setValue(false); }, 500);
               debug(`Save: "${results.content.key}" = "${results.content.value}"`);
             } else {
               res.status(500).send('SAVE_FAILED');
