@@ -8,7 +8,7 @@ function debug(msg) {
 let Service;
 let Characteristic;
 let CustomServer;
-let Characteristics;
+const Characteristics = {};
 
 class HBSOS {
   constructor(log, config) {
