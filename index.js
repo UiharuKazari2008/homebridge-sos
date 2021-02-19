@@ -141,6 +141,17 @@ class HBSOS {
       }
     };
 
+    this.triggerMotionEvent = () => {
+      MotionService
+        .getCharacteristic(Characteristic.MotionDetected)
+        .updateValue(true);
+      setTimeout(() => {
+        MotionService
+          .getCharacteristic(Characteristic.MotionDetected)
+          .updateValue(false);
+      });
+    };
+
     this.getItem = (key) => {
       storage.get(key)
         // eslint-disable-next-line consistent-return
@@ -218,6 +229,7 @@ class HBSOS {
       app.get('/set', async (req, res) => {
         if (req.query.item !== undefined && req.query.value !== undefined && req.query.item !== '' && req.query.value !== '') {
           // eslint-disable-next-line no-inner-declarations
+          this.triggerMotionEvent();
           function writeItem(uuid) {
             storage.setItem(req.query.item, {
               item: req.query.value,
@@ -229,12 +241,6 @@ class HBSOS {
                   res.status(200).send('OK');
                   Characteristics[uuid]
                     .setValue(results.content.value.item);
-                  Characteristic.MotionDetected
-                    .setValue(true);
-                  setTimeout(() => {
-                    Characteristic.MotionDetected
-                      .setValue(false);
-                  });
                   debug(`Save: "${results.content.key}" = "${results.content.value}"`);
                 } else {
                   res.status(500).send('SAVE_FAILED');
