@@ -161,7 +161,7 @@ class HBSOS {
         });
     };
 
-    this.setItem = (uuid, value) => {
+    this.setValue = (uuid, value) => {
       MotionService
         .getCharacteristic(Characteristics[uuid])
         .setValue(value);
@@ -243,7 +243,7 @@ class HBSOS {
                 console.log(results);
                 if (results && results.content.value.item === req.query.value) {
                   res.status(200).send('OK');
-                  this.setItem(uuid, results.content.value.item);
+                  this.setValue(uuid, results.content.value.item);
                   this.triggerMotionEvent();
                   debug(`Save: "${results.content.key}" = "${results.content.value}"`);
                 } else {
