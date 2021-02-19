@@ -119,11 +119,11 @@ const server = (Options, TLSOpts) => {
   app.get('/set', async (req, res) => {
     if (req.query.item !== undefined && req.query.value !== undefined && req.query.item !== '' && req.query.value !== '') {
       storage.getItem(req.query.item)
-        .then((results) => {
-          if (results !== undefined && results !== 'undefined' && results !== '') {
+        .then((originalItem) => {
+          if (originalItem !== undefined && originalItem !== 'undefined' && originalItem !== '') {
             storage.setItem(req.query.item, {
               item: req.query.value,
-              uuid: results.uuid,
+              uuid: originalItem.uuid,
             })
               .then((results) => {
                 if (results && results.content.value === req.query.value) {
