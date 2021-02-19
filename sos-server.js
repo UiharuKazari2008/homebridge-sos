@@ -128,7 +128,7 @@ const server = (Options, TLSOpts) => {
             })
               .then((results) => {
                 console.log(results);
-                if (results && results.content.value === req.query.value) {
+                if (results && results.content.value.item === req.query.value.item) {
                   res.status(200).send('OK');
                   debug(`Save: "${results.content.key}" = "${results.content.value}"`);
                 } else {
@@ -148,7 +148,7 @@ const server = (Options, TLSOpts) => {
             })
               .then((results) => {
                 console.log(results);
-                if (results && results.content.value === req.query.value) {
+                if (results && results.content.value.item === req.query.value.item) {
                   res.status(200).send('OK');
                   debug(`Save: "${results.content.key}" = "${results.content.value}"`);
                 } else {
