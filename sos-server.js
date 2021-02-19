@@ -117,7 +117,7 @@ const server = (Options, TLSOpts) => {
       let uuid;
       storage.getItem(req.query.item)
         .then((results) => {
-          if (results && results !== 'undefined' && results !== '') {
+          if (results !== undefined && results !== 'undefined' && results !== '') {
             uuid = results.uuid;
           } else {
             uuid = uuidv4();

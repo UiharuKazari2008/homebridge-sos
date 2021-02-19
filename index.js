@@ -1,5 +1,9 @@
-const debug = require('debug')('homebridge-sos');
+// const debug = require('debug')('homebridge-sos');
 const ACRSOS = require('./sos-server');
+
+function debug(msg) {
+  console.log(msg);
+}
 
 let Service;
 let Characteristic;
@@ -88,25 +92,27 @@ class HBSOS {
 
   async addCharacteristics() {
     CustomServer.getAllItems.then((results) => {
-      console.log(results);
+      debug(results);
       if (results.length > 0) {
         results.forEach((object) => {
-          this.motionService
-            .addCharacteristic(() => {
-              const char = new Characteristic(object.key, object.uuid);
+          if (object.uuid !== undefined) {
+            this.motionService
+              .addCharacteristic(() => {
+                const char = new Characteristic(object.key, object.uuid);
 
-              char.setProps({
-                format: Characteristic.Formats.UINT8,
-                maxValue: 12,
-                minValue: 1,
-                minStep: 1,
-                perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY],
-              });
-              char.value = object.value;
+                char.setProps({
+                  format: Characteristic.Formats.UINT8,
+                  maxValue: 12,
+                  minValue: 1,
+                  minStep: 1,
+                  perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY],
+                });
+                char.value = object.value;
 
-              return char;
-            })
-            .on('get', callback => callback(null, CustomServer.getItem(object.key)));
+                return char;
+              })
+              .on('get', callback => callback(null, CustomServer.getItem(object.key)));
+          }
         });
       }
     });
