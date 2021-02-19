@@ -73,7 +73,8 @@ class HBSOS {
       }
     });
 
-    setTimeout(this.refreshValues, 5000);
+    this.refreshValues();
+    setInterval(this.refreshValues, 60000);
   }
 
   getServices() {
@@ -100,11 +101,6 @@ class HBSOS {
         });
       }
     });
-    // Set timeout
-    setTimeout(
-      this.refreshValues.bind(this),
-      60000,
-    );
   }
 }
 
