@@ -104,18 +104,16 @@ class HBSOS {
       if (results.length > 0) {
         results.forEach((object) => {
           if (object.uuid !== undefined) {
+            const char = new Characteristic(object.key, object.uuid);
+
+            char.setProps({
+              format: Characteristic.Formats.STRING,
+              perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY],
+            });
+            char.value = object.value;
+
             this.motionService
-              .addCharacteristic(() => {
-                const char = new Characteristic(object.key, object.uuid);
-
-                char.setProps({
-                  format: Characteristic.Formats.STRING,
-                  perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY],
-                });
-                char.value = object.value;
-
-                return char;
-              })
+              .addCharacteristic(char)
               .on('get', callback => callback(null, this.getItem(object.key)));
           }
         });
