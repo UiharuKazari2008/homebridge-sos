@@ -147,6 +147,7 @@ class HBSOS {
         MotionService
           .getCharacteristic(Characteristic.MotionDetected)
           .updateValue(false);
+      });
     }
 
     const results = this.getAllItems();
