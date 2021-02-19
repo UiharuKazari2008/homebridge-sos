@@ -243,7 +243,7 @@ class HBSOS {
                 console.log(results);
                 if (results && results.content.value.item === req.query.value) {
                   res.status(200).send('OK');
-                  this.setCharValue(uuid, results.content.value.item);
+                  // this.setCharValue(uuid, results.content.value.item);
                   this.triggerMotionEvent();
                   debug(`Save: "${results.content.key}" = "${results.content.value}"`);
                 } else {
