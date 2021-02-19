@@ -37,8 +37,7 @@ class HBSOS {
       };
     }
 
-    this.motionService = new Service.MotionSensor(this.name);
-    MotionService = this.motionService;
+    MotionService = new Service.MotionSensor(this.name);
 
     CustomServer = ACRSOS({
       httpPort: this.httpport,
@@ -70,7 +69,7 @@ class HBSOS {
 
             Characteristics[object.uuid] = char;
 
-            this.motionService
+            MotionService
               .addCharacteristic(Characteristics[object.uuid])
               .on('get', callback => callback(null, CustomServer.getItem(object.key)));
           }
@@ -83,7 +82,7 @@ class HBSOS {
   }
 
   getServices() {
-    return [this.motionService];
+    return [MotionService];
   }
   refreshValues() {
     CustomServer.getAllItems.then((results) => {
@@ -99,7 +98,7 @@ class HBSOS {
             });
             char.value = object.value;
 
-            this.motionService
+            MotionService
               .getCharacteristic(Characteristics[object.uuid])
               .updateValue(CustomServer.getItem(object.key));
           }
