@@ -139,6 +139,15 @@ class HBSOS {
         });
       }
     }
+    this.triggerMotionEvent = () => {
+      MotionService
+        .getCharacteristic(Characteristic.MotionDetected)
+        .updateValue(true);
+      setTimeout(() => {
+        MotionService
+          .getCharacteristic(Characteristic.MotionDetected)
+          .updateValue(false);
+    }
 
     const results = this.getAllItems();
     debug(results);
@@ -265,10 +274,7 @@ class HBSOS {
               if (results && results.content.value.item === req.query.value) {
                 res.status(200).send('OK');
                 Characteristics[uuid].setValue(results.content.value.item);
-                Characteristic.MotionDetected.updateValue(true);
-                setTimeout(() => {
-                  Characteristic.MotionDetected.updateValue(false);
-                }, 500);
+                this.triggerMotionEvent();
                 debug(`Save: "${results.content.key}" = "${results.content.value}"`);
               } else {
                 res.status(500).send('SAVE_FAILED');
