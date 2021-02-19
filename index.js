@@ -138,7 +138,8 @@ class HBSOS {
           }
         });
       }
-    }
+    };
+
     this.triggerMotionEvent = () => {
       MotionService
         .getCharacteristic(Characteristic.MotionDetected)
@@ -148,7 +149,7 @@ class HBSOS {
           .getCharacteristic(Characteristic.MotionDetected)
           .updateValue(false);
       });
-    }
+    };
 
     const results = this.getAllItems();
     debug(results);
