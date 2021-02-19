@@ -52,6 +52,7 @@ class HBSOS {
 
   refreshValues() {
     CustomServer.getAllItems.then((results) => {
+      debug(results);
       results.forEach((object) => {
         this.motionService
           .getCharacteristic(() => {
@@ -80,6 +81,7 @@ class HBSOS {
 
   async addCharacteristics() {
     this.CustomServer.getAllItems.then((results) => {
+      debug(results);
       results.forEach((object) => {
         this.motionService
           .addCharacteristic(() => {
