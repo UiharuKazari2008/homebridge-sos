@@ -166,7 +166,7 @@ class HBSOS {
   }
 
   generateItems() {
-    this.getAllItems.then((results) => {
+    getAllItems.then((results) => {
       debug(results);
       if (results.length > 0) {
         results.forEach((object) => {
@@ -259,6 +259,7 @@ class HBSOS {
     });
     app.get('/set', async (req, res) => {
       if (req.query.item !== undefined && req.query.value !== undefined && req.query.item !== '' && req.query.value !== '') {
+        // eslint-disable-next-line no-inner-declarations
         function writeItem(uuid) {
           storage.setItem(req.query.item, {
             item: req.query.value,
@@ -269,8 +270,14 @@ class HBSOS {
               if (results && results.content.value.item === req.query.value) {
                 res.status(200).send('OK');
                 Characteristics[uuid].setValue(results.content.value.item);
-                MotionService.getCharacteristic(Characteristic.MotionDetected).updateValue(true);
-                setTimeout(() => { MotionService.getCharacteristic(Characteristic.MotionDetected).updateValue(false); }, 500);
+                MotionService
+                  .getCharacteristic(Characteristic.MotionDetected)
+                  .updateValue(true);
+                setTimeout(() => {
+                  MotionService
+                    .getCharacteristic(Characteristic.MotionDetected)
+                    .updateValue(false);
+                }, 500);
                 debug(`Save: "${results.content.key}" = "${results.content.value}"`);
               } else {
                 res.status(500).send('SAVE_FAILED');
