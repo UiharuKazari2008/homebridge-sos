@@ -22,7 +22,7 @@ let storage;
 const Characteristics = {};
 
 class HBSOS {
-  async constructor(log, config) {
+  constructor(log, config) {
     this.log = log;
     this.name = config.name;
 
@@ -96,37 +96,39 @@ class HBSOS {
       });
     }
 
-    this.getAllItems = async () => {
-      await storage.keys()
-        // eslint-disable-next-line consistent-return
-        .then((keys) => {
-          if (keys.length === 0) {
-            return [];
-          }
-          const results = [];
-          keys.forEach((key, index) => {
-            storage.get(key)
-              // eslint-disable-next-line consistent-return
-              .then((value) => {
-                results.push({
-                  key,
-                  value: value.item,
-                  uuid: value.uuid,
+    this.getAllItems = () => {
+      return new Promise((resolve) => {
+        storage.keys()
+          // eslint-disable-next-line consistent-return
+          .then((keys) => {
+            if (keys.length === 0) {
+              resolve([]);
+            }
+            const results = [];
+            keys.forEach((key, index) => {
+              storage.get(key)
+                // eslint-disable-next-line consistent-return
+                .then((value) => {
+                  results.push({
+                    key,
+                    value: value.item,
+                    uuid: value.uuid,
+                  });
+                  if (index === keys.length - 1) {
+                    resolve(results);
+                  }
+                })
+                .catch((err) => {
+                  debug(err.message);
+                  resolve([]);
                 });
-                if (index === keys.length - 1) {
-                  return results;
-                }
-              })
-              .catch((err) => {
-                debug(err.message);
-                return [];
-              });
+            });
+          })
+          .catch((err) => {
+            debug(err.message);
+            resolve([]);
           });
-        })
-        .catch((err) => {
-          debug(err.message);
-          return [];
-        });
+      });
     };
     this.refreshValues = () => {
       const results = this.getAllItems();
@@ -169,10 +171,7 @@ class HBSOS {
 
     this.startServer = async () => {
       app.use(express.json({ limit: '5mb' }));
-      app.use(express.urlencoded({
-        extended: true,
-        limit: '5mb'
-      }));
+      app.use(express.urlencoded({ extended: true, limit: '5mb' }));
       app.use((req, res, next) => {
         res.header('Access-Control-Allow-Origin', '*'); // update to match the domain you will make the request from
         res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, X-WSS-Key, X-API-Key, X-User-Agent, User-Agent');
@@ -180,32 +179,27 @@ class HBSOS {
       });
 
       app.get('/', (req, res) => {
-        res.status(200)
-          .send('<b>Lizumi storage API v1.2</b>');
+        res.status(200).send('<b>Lizumi storage API v1.2</b>');
       });
       app.get('/get', (req, res) => {
         if (req.query.item !== undefined && req.query.item !== '') {
           storage.getItem(req.query.item)
             .then((results) => {
               if (results && results !== 'undefined' && results !== '') {
-                res.status(200)
-                  .send(results);
+                res.status(200).send(results);
                 debug(`Request: "${req.query.item}" = "${results}"`);
               } else {
-                res.status(404)
-                  .send('NOT_FOUND');
+                res.status(404).send('NOT_FOUND');
                 debug(`Request Error: "${req.query.item}" does not exist yet`);
               }
             })
             .catch((err) => {
-              res.status(500)
-                .send();
+              res.status(500).send();
               debug(`Request Error: "${req.query.item}"`);
               debug(err);
             });
         } else {
-          res.status(500)
-            .send('INVALID_REQUEST');
+          res.status(500).send('INVALID_REQUEST');
           debug('Request Error missing query!');
         }
       });
@@ -213,21 +207,16 @@ class HBSOS {
         storage.keys()
           .then((keys) => {
             if (keys.length === 0) {
-              res.status(404)
-                .send('EMPTY');
+              res.status(404).send('EMPTY');
               debug('Request Error: There are no items in storage');
             } else {
               const results = [];
               keys.forEach((key, index) => {
                 storage.get(key)
                   .then((value) => {
-                    results.push({
-                      key,
-                      value
-                    });
+                    results.push({ key, value });
                     if (index === keys.length - 1) {
-                      res.status(200)
-                        .send(results);
+                      res.status(200).send(results);
                       debug(results);
                     }
                   })
@@ -239,8 +228,7 @@ class HBSOS {
             }
           })
           .catch((err) => {
-            res.status(500)
-              .send();
+            res.status(500).send();
             debug('Request Error:');
             debug(err);
           });
@@ -256,20 +244,17 @@ class HBSOS {
               .then((results) => {
                 console.log(results);
                 if (results && results.content.value.item === req.query.value) {
-                  res.status(200)
-                    .send('OK');
+                  res.status(200).send('OK');
                   this.setCharValue(uuid, results.content.value.item);
                   this.triggerMotionEvent();
                   debug(`Save: "${results.content.key}" = "${results.content.value}"`);
                 } else {
-                  res.status(500)
-                    .send('SAVE_FAILED');
+                  res.status(500).send('SAVE_FAILED');
                   debug(`Save Error: "${req.query.item}" did not save correctly`);
                 }
               })
               .catch((err) => {
-                res.status(500)
-                  .send();
+                res.status(500).send();
                 debug(`Save Error: "${req.query.item}" = "${req.query.value}"`);
                 debug(err);
               });
@@ -284,8 +269,7 @@ class HBSOS {
               }
             });
         } else {
-          res.status(500)
-            .send('INVALID_REQUEST');
+          res.status(500).send('INVALID_REQUEST');
           debug('Save Error missing query or value!');
         }
       });
@@ -294,60 +278,59 @@ class HBSOS {
           storage.removeItem(req.query.item)
             .then((results) => {
               if (results && results.removed) {
-                res.status(200)
-                  .send('OK');
+                res.status(200).send('OK');
                 debug(results);
               } else if (results && results.existed === false) {
-                res.status(200)
-                  .send('OK');
+                res.status(200).send('OK');
                 debug(results);
               } else {
-                res.status(500)
-                  .send('DELETE_FAILED');
+                res.status(500).send('DELETE_FAILED');
                 debug(`Delete Error: "${req.query.item}" was not removed`);
               }
             })
             .catch((err) => {
-              res.status(500)
-                .send();
+              res.status(500).send();
               debug(`Delete Error: "${req.query.item}" = "${req.query.value}"`);
               debug(err);
             });
         } else {
-          res.status(500)
-            .send('INVALID_REQUEST');
+          res.status(500).send('INVALID_REQUEST');
           debug('Delete Error missing query!');
         }
       });
     };
 
-    const results = await this.getAllItems();
-    debug(results);
-    if (results.length > 0) {
-      results.forEach((object) => {
-        if (object.uuid !== undefined) {
-          const char = new Characteristic(object.key, object.uuid);
+    this.generateItems = () => {
+      this.getAllItems().then((results) => {
+        debug(results);
+        if (results.length > 0) {
+          results.forEach((object) => {
+            if (object.uuid !== undefined) {
+              const char = new Characteristic(object.key, object.uuid);
 
-          char.setProps({
-            format: Characteristic.Formats.STRING,
-            perms: [
-              Characteristic.Perms.READ,
-              Characteristic.Perms.NOTIFY,
-            ],
+              char.setProps({
+                format: Characteristic.Formats.STRING,
+                perms: [
+                  Characteristic.Perms.READ,
+                  Characteristic.Perms.NOTIFY,
+                ],
+              });
+              char.value = object.value;
+
+              Characteristics[object.uuid] = char;
+
+              MotionService
+                .addCharacteristic(Characteristics[object.uuid])
+                .on('get', callback => callback(null, this.getItem(object.key)));
+            }
           });
-          char.value = object.value;
-
-          Characteristics[object.uuid] = char;
-
-          MotionService
-            .addCharacteristic(Characteristics[object.uuid])
-            .on('get', callback => callback(null, this.getItem(object.key)));
         }
       });
-    }
+    };
 
     setTimeout(this.refreshValues, 5000);
     setInterval(this.refreshValues, 60000);
+    this.generateItems();
     this.startServer();
   }
 
