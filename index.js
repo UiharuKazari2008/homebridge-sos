@@ -52,7 +52,27 @@ class HBSOS {
       });
     }
 
-    this.addCharacteristics();
+    CustomServer.getAllItems.then((results) => {
+      debug(results);
+      if (results.length > 0) {
+        results.forEach((object) => {
+          if (object.uuid !== undefined) {
+            const char = new Characteristic(object.key, object.uuid);
+
+            char.setProps({
+              format: Characteristic.Formats.STRING,
+              perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY],
+            });
+            char.value = object.value;
+
+            this.motionService
+              .addCharacteristic(char)
+              .on('get', callback => callback(null, CustomServer.getItem(object.key)));
+          }
+        });
+      }
+    });
+
     this.refreshValues();
   }
 
@@ -88,29 +108,6 @@ class HBSOS {
       this.refreshValues.bind(this),
       60000,
     );
-  }
-
-  async addCharacteristics() {
-    CustomServer.getAllItems.then((results) => {
-      debug(results);
-      if (results.length > 0) {
-        results.forEach((object) => {
-          if (object.uuid !== undefined) {
-            const char = new Characteristic(object.key, object.uuid);
-
-            char.setProps({
-              format: Characteristic.Formats.STRING,
-              perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY],
-            });
-            char.value = object.value;
-
-            this.motionService
-              .addCharacteristic(char)
-              .on('get', callback => callback(null, CustomServer.getItem(object.key)));
-          }
-        });
-      }
-    });
   }
 }
 
